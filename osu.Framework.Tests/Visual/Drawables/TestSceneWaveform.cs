@@ -41,7 +41,7 @@ namespace osu.Framework.Tests.Visual.Drawables
         {
             var store = audio.GetTrackStore(game.Resources);
 
-            const string track_name = "Tracks/sample-track.mp3";
+            const string track_name = "Tracks/usao-megamix.mp3";
 
             track = store.Get(track_name);
             waveform = new Waveform(store.GetStream(track_name));
@@ -150,6 +150,8 @@ namespace osu.Framework.Tests.Visual.Drawables
             private readonly Track track;
             private readonly TestWaveformGraph graph;
             private readonly Drawable marker;
+            private readonly SpriteText trackStat;
+            private readonly Container containerStat;
 
             public TestWaveform(Track track, float resolution)
             {
@@ -169,10 +171,11 @@ namespace osu.Framework.Tests.Visual.Drawables
                         MidColour = new Color4(255, 153, 19, 255),
                         HighColour = new Color4(255, 46, 7, 255),
                     },
-                    new Container
+                    containerStat = new Container
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Origin = Anchor.CentreLeft,
+                        RelativePositionAxes = Axes.X,
+                        Y = 50,
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
@@ -182,12 +185,11 @@ namespace osu.Framework.Tests.Visual.Drawables
                                 Colour = Color4.Black,
                                 Alpha = 0.75f
                             },
-                            new SpriteText
+                            trackStat = new SpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Padding = new MarginPadding(4),
-                                Text = $"Resolution: {resolution:0.00}"
                             }
                         }
                     },
@@ -213,7 +215,11 @@ namespace osu.Framework.Tests.Visual.Drawables
                 base.Update();
 
                 if (track.IsLoaded)
+                {
                     marker.X = (float)(track.CurrentTime / track.Length);
+                    containerStat.X = (float)(track.CurrentTime / track.Length);
+                    trackStat.Text = $"Track current time: {track.CurrentTime:0.00} average amplitude: {track.CurrentAmplitudes.Average:0.000}";
+                }
             }
 
             private bool mouseDown;
